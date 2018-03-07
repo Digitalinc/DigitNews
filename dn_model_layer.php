@@ -42,7 +42,7 @@ class dn_model_layer {
         }
     }
 
-    public function insertFeeds($user, $sourceid, $title, $description, $author, $url, $urltoimg, $publishedat) {
+    public function insertFeeds($feedid,$user, $sourceid, $title, $description, $author, $url, $urltoimg, $publishedat) {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         if (!$con) {
             return FALSE;
@@ -50,9 +50,9 @@ class dn_model_layer {
             try {
                 mysqli_select_db($con, $this->dbname);
                 $this->query = "insert into "
-                        . "sources_feed_data(feed_entrydttm,feed_user,feed_source_unique_id,"
+                        . "sources_feed_data(feed_unique_id,feed_entrydttm,feed_user,feed_source_unique_id,"
                         . "feed_title,feed_description,feed_url,feed_author,feed_img,feed_publishedat) "
-                        . "values('" . date("Y-m-d h:i:sa") . "',$user,$sourceid,'$title','$description','$url','$author','$urltoimg','$publishedat')";
+                        . "values($feedid,'" . date("Y-m-d h:i:sa") . "',$user,$sourceid,'$title','$description','$url','$author','$urltoimg','$publishedat')";
 
                 mysqli_query($con, $this->query);
                 if (mysqli_affected_rows($con) > 0) {
@@ -66,7 +66,7 @@ class dn_model_layer {
         }
     }
 
-    public function insertFeeds_woapi($user, $sourceid, $title, $description, $author, $url, $urltoimg, $publishedat) {
+    public function insertFeeds_woapi($feedid,$user, $sourceid, $title, $description, $author, $url, $urltoimg, $publishedat) {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         if (!$con) {
             return FALSE;
@@ -74,9 +74,9 @@ class dn_model_layer {
             try {
                 mysqli_select_db($con, $this->dbname);
                 $this->query = "insert into "
-                        . "sources_feed_data1(feed_entrydttm,feed_user,feed_source_unique_id,"
+                        . "sources_feed_data1(feed_unique_id,feed_entrydttm,feed_user,feed_source_unique_id,"
                         . "feed_title,feed_description,feed_url,feed_author,feed_img,feed_publishedat) "
-                        . "values('" . date("Y-m-d h:i:sa") . "',$user,$sourceid,'$title','$description','$url','$author','$urltoimg','$publishedat')";
+                        . "values($feedid,'" . date("Y-m-d h:i:sa") . "',$user,$sourceid,'$title','$description','$url','$author','$urltoimg','$publishedat')";
 
                 mysqli_query($con, $this->query);
                 if (mysqli_affected_rows($con) > 0) {
@@ -128,10 +128,73 @@ class dn_model_layer {
         }
     }
 
-    public function get_Feeds($language) {
-        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
-        $startlimit = $_SESSION["startlimit"];
+    public function get_Feeds($language,$pageid,$source) {
+        $startlimit = 0;
+        $endlimit = 0;
+        if ($pageid == 0) {
+            $startlimit = 0;
+        } else {
+            $startlimit = $pageid * 20;
+        }
         $endlimit = $startlimit + 20;
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            if($source == 0)
+            {
+               $this->query = "SELECT
+                                feed_unique_id,
+                                feed_entrydttm,
+                                feed_user,
+                                sources_metadata.source_id,
+                                sources_metadata.source_name,
+                                feed_title,
+                                feed_description,
+                                feed_url,
+                                feed_author,
+                                feed_img,
+                                feed_publishedat,
+                                category_metadata.category_abbr
+                            FROM
+                                sources_feed_data
+                            LEFT OUTER JOIN sources_metadata ON sources_feed_data.feed_source_unique_id = sources_metadata.source_unique_id
+                            LEFT OUTER JOIN category_metadata ON sources_metadata.source_category = category_metadata.category_unique_id
+                            where sources_metadata.source_language=$language
+                            Order by feed_publishedat DESC LIMIT $startlimit,$endlimit";
+            $result_set = mysqli_query($con, $this->query); 
+            }
+            else
+            {
+              $this->query = "SELECT
+                                feed_unique_id,
+                                feed_entrydttm,
+                                feed_user,
+                                sources_metadata.source_id,
+                                sources_metadata.source_name,
+                                feed_title,
+                                feed_description,
+                                feed_url,
+                                feed_author,
+                                feed_img,
+                                feed_publishedat,
+                                category_metadata.category_abbr
+                            FROM
+                                sources_feed_data1
+                            LEFT OUTER JOIN sources_metadata ON sources_feed_data.feed_source_unique_id = sources_metadata.source_unique_id
+                            LEFT OUTER JOIN category_metadata ON sources_metadata.source_category = category_metadata.category_unique_id
+                            where sources_metadata.source_language=$language
+                            Order by feed_publishedat DESC LIMIT $startlimit,$endlimit";
+            $result_set = mysqli_query($con, $this->query);  
+            }
+            
+            return $result_set;
+        }
+    }
+
+public function get_Feeds_onid($id) {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         if (!$con) {
             return FALSE;
         } else {
@@ -153,12 +216,13 @@ class dn_model_layer {
                                 sources_feed_data
                             LEFT OUTER JOIN sources_metadata ON sources_feed_data.feed_source_unique_id = sources_metadata.source_unique_id
                             LEFT OUTER JOIN category_metadata ON sources_metadata.source_category = category_metadata.category_unique_id
-                            where sources_metadata.source_language=$language
-                            Order by feed_publishedat DESC LIMIT $startlimit,$endlimit";
+                            where feed_unique_id=$id
+                            Order by feed_publishedat DESC";
             $result_set = mysqli_query($con, $this->query);
             return $result_set;
         }
     }
+
     
     public function get_Feeds_Category($language, $category) {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
@@ -259,7 +323,7 @@ class dn_model_layer {
         if ($pageid == 0) {
             $startlimit = 0;
         } else {
-            $startlimit = $pageid + 40;
+            $startlimit = $pageid * 40;
         }
         $endlimit = $startlimit + 40;
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
@@ -267,12 +331,24 @@ class dn_model_layer {
             return FALSE;
         } else {
             mysqli_select_db($con, $this->dbname);
-            $this->query = "SELECT video_feed_id,video_id,video_title,video_img,uploaded_date,video_views,video_feed_Views from video_feeds where video_language=$language LIMIT $startlimit,$endlimit";
+            $this->query = "SELECT video_feed_id,video_id,video_title,video_img,uploaded_date,video_views,video_feed_Views from video_feeds where video_language=$language order by uploaded_date desc LIMIT $startlimit,$endlimit";
             $resultset = mysqli_query($con, $this->query);
             return $resultset;
         }
     }
 
+    public function get_Video_Feeds_OnId($id) {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            $this->query = "SELECT video_feed_id,video_id,video_title,video_img,uploaded_date,video_views,video_feed_Views from video_feeds where video_feed_id='$id'";
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
+        }
+    }
+    
     public function get_Language_Id($lang) {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         if (!$con) {
@@ -337,7 +413,7 @@ class dn_model_layer {
             mysqli_select_db($con, $this->dbname);
             if($userid == 0)
             {
-                $this->query = "Select distinct Poll_id,poll_title,poll_question,poll_option_1,poll_option_2,poll_option_3,poll_option_4,poll_option_5,poll_duration,timediff('".date("Y-m-d h:i:sa")."',poll_duration),option1_count,option2_count,option3_count,option4_count,option5_count from polls_feed_data order by created_dttm desc limit $pollstartlimit,$pollendlimit";
+                $this->query = "Select distinct Poll_id,poll_title,poll_question,poll_option_1,poll_option_2,poll_option_3,poll_option_4,poll_option_5,poll_duration,timediff('".date("Y-m-d h:i:sa")."',poll_duration),option1_count,option2_count,option3_count,option4_count,option5_count,0 from polls_feed_data order by created_dttm desc limit $pollstartlimit,$pollendlimit";
             }
             else
             {
@@ -348,7 +424,26 @@ class dn_model_layer {
         }
     }
     
-    public function poll_Vote($pollid,$polloption) 
+    public function get_Poll_Feeds_OnId($id,$userid) {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            if($userid == 0)
+            {
+                $this->query = "Select distinct Poll_id,poll_title,poll_question,poll_option_1,poll_option_2,poll_option_3,poll_option_4,poll_option_5,poll_duration,timediff('".date("Y-m-d h:i:sa")."',poll_duration),option1_count,option2_count,option3_count,option4_count,option5_count,0 from polls_feed_data where poll_id=$id";
+            }
+            else
+            {
+                $this->query = "Select distinct polls_feed_data.Poll_id,poll_title,poll_question,poll_option_1,poll_option_2,poll_option_3,poll_option_4,poll_option_5,poll_duration,timediff('".date("Y-m-d h:i:sa")."',poll_duration),option1_count,option2_count,option3_count,option4_count,option5_count,vote_answer from polls_feed_data left outer join polls_vote_data on (polls_feed_data.poll_id=polls_vote_data.poll_id and vote_by=$userid) where poll_id=$id";
+            }
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
+        }
+    }
+    
+    public function poll_Vote($pollid,$polloption,$userid) 
     {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         $con_temp = mysqli_connect($this->dbserver, $this->username, $this->password);
@@ -357,11 +452,11 @@ class dn_model_layer {
         } else {
             try {
                 mysqli_select_db($con, $this->dbname);
-                $this->query = "update polls_feed_data set option_".$polloption."_count=option_".$polloption."_count +1 where poll_id=$pollid";
+                $this->query = "update polls_feed_data set option".$polloption."_count=option".$polloption."_count +1 where poll_id=$pollid";
                 mysqli_query($con, $this->query);
                 if (mysqli_affected_rows($con) > 0) {
                     mysqli_select_db($con_temp, $this->dbname);
-                    $this->query = "insert into polls_vote_data values($pollid,$polloption,0,'" . date("Y-m-d h:i:sa") . "')";
+                    $this->query = "insert into polls_vote_data values($pollid,$polloption,$userid,'" . date("Y-m-d h:i:sa") . "')";
                     mysqli_query($con_temp, $this->query);
                     if (mysqli_affected_rows($con_temp) > 0)
                     {
@@ -413,7 +508,6 @@ class dn_model_layer {
             {
                 mysqli_select_db($con_temp, $this->dbname);
                 $result= mysqli_fetch_row($resultset);
-                $_SESSION["userid"]=$result[0];
                 $this->query="insert into login_data values('$result[0]',$device,'". date("Y-m-d h:i:sa") ."')";
                 mysqli_query($con_temp, $this->query);
                 if(mysqli_affected_rows($con_temp)>0)
@@ -523,6 +617,32 @@ class dn_model_layer {
             } catch (Exception $exc) {
                 return "Failure";
             }
+        }
+    }
+    
+    public function retrive_Metadata($id,$type)
+    {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            $this->query="";
+            if($type==1)
+            {
+                $this->query = "Select feed_title,feed_description,feed_img from sources_feed_data where feed_unique_id=$id";
+            }
+            else if ($type ==2)
+            {
+                $this->query = "Select video_title,video_desc,video_img from video_feeds where video_feed_id='$id'";
+            }
+            else
+            {
+                $this->query = "Select poll_title,poll_question from polls_feed_data where poll_id=$id";
+            }
+            
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
         }
     }
 }

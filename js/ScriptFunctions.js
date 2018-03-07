@@ -1,28 +1,24 @@
 function loadfeedframe(url)
 {
-//    var title=$("#"+url).text();
-//    var dialog = bootbox.dialog({
-//        title: "",
-//        message: "<div class='popupfeeddiv'>\n\
-//                    <iframe src='https://www.youtube-nocookie.com/embed/"+url+"?rel=0&amp;controls=0&amp;showinfo=0' frameborder='0' allowfullscreen></iframe>\n\
-//                    <div style='margin-top:10px;'><h6>"+title+"</h6></div>\n\
-//                    </div>"
-//    });
-//    dialog.init(function () {
-//        setTimeout(function () {
-//            dialog.find('.bootbox-body').html('I was loaded after the dialog was shown!');
-//        }, 3000);
-//    });
-
 var title=$("#"+url).text();
 // Get the modal
 var modal = document.getElementById('myModal');
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
-var content_html="<iframe src='https://www.youtube-nocookie.com/embed/"+url+"?rel=0&amp;controls=0&amp;showinfo=0' frameborder='0' allowfullscreen></iframe><div style='margin-top:10px;'><h6 style='color:white !important;'>"+title+"</h6>";
+var content_html="<iframe src='https://www.youtube-nocookie.com/embed/"+url+"?rel=0&amp;showinfo=0' frameborder='0' allowfullscreen></iframe><div style='margin-top:10px;'><h6 style='color:white !important;'>"+title+"</h6>";
 
 $("#popupfeed_div").html(content_html);
+var x = screen.width;
+if(x>640)
+{
+    $("#popupfeed_div").css("marginTop:","5%");
+}
+else
+{
+    $("#popupfeed_div").css("marginTop:","40%");
+}
 modal.style.display = "block";
+
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
     modal.style.display = "none";
@@ -40,8 +36,91 @@ window.onclick = function(event) {
 
 }
 
+function sharecontent(id,type)
+{
+    var url="http://www.digitnews.in/Vw.php";
+    if(type == 1)
+    {
+        url="http://www.digitnews.in/Vw.php?tid="+id;
+    }
+    else if(type ==2)
+    {
+        url="http://www.digitnews.in/Vw.php?vid="+id;
+    }
+    else
+    {
+        url="http://www.digitnews.in/Vw.php?plid="+id;
+    }
+    // Get the modal
+    var modal = document.getElementById('myModal');
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+    var content_html="<div>\n\
+                        <div class='share_textbox'><input type='text' value='"+url+"' /></div>\n\
+                        <div style='text-align:center;color:white;'>or</div>\n\
+                        <div class='social-share-btns-container'>\n\
+                            <div class='social-share-btns'>\n\
+                              <a class='share-btn share-btn-facebook' href='https://www.facebook.com/sharer/sharer.php?u="+url+"' rel='nofollow' target='_blank'>\n\
+                                <i class='ion-social-facebook'></i>\n\
+                                Share\n\
+                              </a>\n\
+                              <a class='share-btn share-btn-twitter' href='https://twitter.com/intent/tweet?text="+url+"' rel='nofollow' target='_blank'>\n\
+                                <i class='ion-social-twitter'></i>\n\
+                                Tweet\n\
+                              </a>\n\
+                              <a class='share-btn share-btn-googleplus' href='https://plus.google.com/share?url="+url+"' rel='nofollow' target='_blank'>\n\
+                                <i class='ion-social-googleplus'></i>\n\
+                                Share\n\
+                              </a>\n\
+                              <a class='share-btn share-btn-linkedin' href='https://www.linkedin.com/cws/share?url="+url+"' rel='nofollow' target='_blank'>\n\
+                                <i class='ion-social-linkedin'></i>\n\
+                                Share\n\
+                              </a>\n\
+                              <a class='share-btn share-btn-mail' href='mailto:?subject=Share Feed from DigitNews&amp;amp;body='"+url+" rel='nofollow' target='_blank' title='via email'>\n\
+                                <i class='ion-paper-airplane'></i>\n\
+                                Share\n\
+                              </a>\n\
+                            </div>\n\
+                          </div>\n\
+                      </div>";
+    
+    var x =  screen.width;
+    if(x>640)
+    {
+        $("#popupfeed_div").css("marginTop:","20%");
+        modal.style.marginTop="5%";
+    }
+    else
+    {
+        $("#popupfeed_div").css("marginTop:","40%");
+        modal.style.marginTop="40%";
+    }
+    
+    
+    $("#popupfeed_div").html(content_html);
+    modal.style.display = "block";
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+        $("#popupfeed_div").html("");
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            $("#popupfeed_div").html("");
+        }
+}
+
+
+}
+
 $(document).ready(function () {
     $(".pageloading").fadeOut("slow");
+    $(".news-figureimg").on("error", function(){
+        $(this).attr('src', './img/alt_img.jpg');
+    });
 });
 
 function redirect_language_gallery(lang)
@@ -117,9 +196,13 @@ function update_poll_vote(pollid)
             {
                 if (data == "Success")
                 {
-                    votecount=$("#poll_vote_count_"+vote_poll_id).attr("val");
-                    votecount=votecount + 1;
+                    votecount= $("#poll_vote_count_"+vote_poll_id).attr("val");
+                    votecount=parseInt(votecount) + 1;
                     $("#poll_vote_count_"+vote_poll_id).html("Total Votes : "+ votecount);
+                }
+                else if (data == "login")
+                {
+                    window.location.href='login.php';
                 }
             });
 }
@@ -129,11 +212,13 @@ function show_signup_panel()
     $(".login_container").hide();
     $(".signup_container").show();
 }
+
 function show_login_panel()
 {
     $(".signup_container").hide();
     $(".login_container").show();
 }
+
 function signup_profile()
 {
     var profileemail=$("#signup-email").val();

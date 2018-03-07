@@ -108,7 +108,7 @@ class dn_Controller_layer {
                     }
                 }
                 $parsefeed_obj = new dn_model_layer();
-                $retvalue = $parsefeed_obj->insertFeeds_woapi(0, $source_unique_id, htmlentities($title, ENT_QUOTES), $descriptioncontent, "", $link, $imageurl, $pubdate);
+                $retvalue = $parsefeed_obj->insertFeeds_woapi($this->post_id_rand_str(9),0, $source_unique_id, htmlentities($title, ENT_QUOTES), $descriptioncontent, "", $link, $imageurl, $pubdate);
                 if (strcmp($retvalue, "Success") == 0) {
                     $successcount = $successcount + 1;
                 } else {
@@ -153,18 +153,18 @@ class dn_Controller_layer {
         return $cateobj->get_Category();
     }
     
-    function getFeeds() {
+    function getFeeds($pageid) {
         $htmldata = "";
-        $altimg = "";
+        $altimg = "alt_img.jpg";
         $lang_id = $this->getLanguage();
         $feedobj = new dn_model_layer();
-        $resultset = $feedobj->get_Feeds($lang_id);
+        $resultset = $feedobj->get_Feeds($lang_id,$pageid,0);
         for ($index = 0; $index < mysqli_num_rows($resultset); $index++) {
             $tempresult = mysqli_fetch_row($resultset);
             $htmldata = $htmldata .
                                 "<div class='news-content'>
                                     <div class='news-img'>
-                                        <img src='$tempresult[9]' alt='images/$altimg' class='news-figureimg'>
+                                        <img src='$tempresult[9]' class='news-figureimg'>
                                     </div>
                                     <div class='news-body'>
                                         <div class=''>
@@ -177,6 +177,42 @@ class dn_Controller_layer {
                                             <div class='news-desc'>
                                                 <p class='text-italic'>" . html_entity_decode($tempresult[6], ENT_QUOTES) . "</p>
                                             </div>
+                                            <div style='float:left;'>
+                                                <button class='videotilesbutton ion ion-share' style='margin-left:5px;' onclick=javascript:sharecontent('$tempresult[0]',1);></button>
+                                            </div>
+                                            <a href='$tempresult[7]' target='_blank' class='read_more'>Read More</a>
+                                        </div>
+                                    </div>
+                                </div>";
+        }
+        
+        return $htmldata;
+    }
+    
+    function getfeed_onid($id) 
+    {
+        $htmldata = "";
+        $altimg = "";
+        $feedobj = new dn_model_layer();
+        $resultset = $feedobj->get_Feeds_onid($id);
+        for ($index = 0; $index < mysqli_num_rows($resultset); $index++) {
+            $tempresult = mysqli_fetch_row($resultset);
+            $htmldata = $htmldata .
+                                "<div class='v_news-content'>
+                                    <div class='v_news-img'>
+                                        <img src='$tempresult[9]' alt='images/$altimg' class='news-figureimg'>
+                                    </div>
+                                    <div class='v_news-body'>
+                                        <div class=''>
+                                            <div class='news-head'>
+                                                <h5 style='color:#FFFFFF;'>" . html_entity_decode($tempresult[5], ENT_QUOTES) . "</h5>
+                                            </div>
+                                            <div class='v_news-publishedinfo'>
+                                                <u><b>Published at </b></u>: $tempresult[10]
+                                            </div>
+                                            <div class='v_news-desc'>
+                                                <p class='text-italic'>" . html_entity_decode($tempresult[6], ENT_QUOTES) . "</p>
+                                            </div>
                                             <a href='$tempresult[7]' target='_blank' class='read_more'>Read More</a>
                                         </div>
                                     </div>
@@ -184,7 +220,7 @@ class dn_Controller_layer {
         }
         return $htmldata;
     }
-    
+   
     function getFeeds_Category() {
         $htmldata = "";
         $filter = "";
@@ -266,13 +302,13 @@ class dn_Controller_layer {
             $htmldata = $htmldata . "<div class='videotiles'>
                                     <a href=javascript:loadfeedframe('$retval[1]'); style='outline:none;'>
                                         <img src='$retval[3]' width='100%' height='75%'>
-                                        <div class='videotilesa' style='max-height:40px;min-height:40px;overflow:hidden;font-size:12px'>
+                                        <div class='videotilesa' style='max-height:40px;overflow:hidden;font-size:12px'>
                                             <p style='margin:0px !important;text-align:left !important;' id='$retval[1]'>$retval[2]</p>
                                         </div>
                                     </a>
                                         <div style='margin-bottom:5px;margin-top:8px;'>
                                             <div style='float:left;'>
-                                                <button class='videotilesbutton ion ion-share' style='margin-left:5px;' onclick=javascript:loadfeedframe('$retval[1]');></button>
+                                                <button class='videotilesbutton ion ion-share' style='margin-left:5px;' onclick=javascript:sharecontent('$retval[0]',2);></button>
                                             </div>
                                             <div style='float:right;margin-right:15px;'>$retval[5] Views</div>
                                         </div>
@@ -281,6 +317,29 @@ class dn_Controller_layer {
         return $htmldata;
     }
 
+    public function get_video_feeds_onid($id) {
+        $videobj = new dn_model_layer();
+        $result = $videobj->get_Video_Feeds_OnId($id);
+        $htmldata = "";
+        for ($index = 0; $index < mysqli_num_rows($result); $index++) {
+            $retval = mysqli_fetch_row($result);
+            $htmldata = $htmldata . "<div class='v_videotiles'>
+                                        <div class='vidtitle' style=''>$retval[2]</div>
+                                        <div class='v_videotiles_frame'>
+                                            <iframe class='youtube-player' type='text/html'  src='https://www.youtube-nocookie.com/embed/$retval[1]?rel=0&amp;showinfo=0' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>
+                                        </div>
+                                        <div style='margin-bottom:5px;margin-top:8px;'>
+                                            <div style='float:left;'>
+                                                <button class='videotilesbutton ion ion-share' style='margin-left:5px;' onclick=javascript:loadfeedframe('$retval[1]');></button>
+                                            </div>
+                                            
+                                            <div style='float:right;margin-right:15px;'>$retval[5] Views</div>
+                                        </div>
+                                 </div>";
+        }
+        return $htmldata;
+    }
+    
     public function get_language_id($lang) {
         $lanobj = new dn_model_layer();
         return $lanobj->get_Language_Id($lang);
@@ -291,6 +350,7 @@ class dn_Controller_layer {
             ;
         return $s;
     }
+    
     public function insert_poll_feed($polltitle,$pollcategory,$pollquestion,$polloption1,$polloption2,$polloption3,$polloption4,$polloption5,$pollduration,$polltags)
     {
         $insertpollfeed=new dn_model_layer();
@@ -394,7 +454,7 @@ class dn_Controller_layer {
                 $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_5' style='display:none;'><div class='poll_item_stat' style='width:$option5_percent%;background-color:lightgray;'>$option5_percent%</div><div class='poll_item_overlay'>$temppolldata[7]</div></div>";
                 $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option5_percent%;background-color:lightgray;'>$option5_percent%</div><div class='poll_item_overlay'>$temppolldata[7]</div></div>";
             }
-            if(strpos($temppolldata[9],'-')===0 && $temppolldata[14] == "")
+            if(strpos($temppolldata[9],'-')===0 && ($temppolldata[15] == "" || $temppolldata[15] ==0) )
             {
                 $htmldata=$htmldata."<div class='poll_feed_container'>"
                                     . "<div class='poll_feed_title'>$temppolldata[1]</div>"
@@ -404,13 +464,15 @@ class dn_Controller_layer {
                                             . $options_Data
                                         ."</ul>"
                                     . "</div>"
+                                    . "<div class='clear_both'></div>"
                                     . "<div class='poll_action_container'>"
                                         . "<div class='poll_vote' id='poll_vote_btn_$temppolldata[0]'><button class='poll_vote_btn' id='$temppolldata[0]_btn' onclick='update_poll_vote($temppolldata[0]);'>Vote</button></div>"
                                         . "<div class='poll_vote' id='poll_vote_count_$temppolldata[0]' style='display:none;' val='$vote_count'>Total Votes : $vote_count</div>"
-                                        . "<div class='poll_duration'>Poll closing by $temppolldata[8]</div>"
+                                        . "<div class='poll_duration'>Poll closing by ".date("jS M Y",strtotime($temppolldata[8]))."</div>"
                                     . "</div>"
+                                    . "<div class='clear_both'></div>"
                                 . "</div>"
-                            . "<div class='clear'></div>";
+                            . "<div class='clear_both'></div>";
             }
             else
             {
@@ -419,22 +481,164 @@ class dn_Controller_layer {
                                     . "<div class='poll_feed_question'>$temppolldata[2]</div>"
                                     . "<div class='poll_feed_options'>"
                                             . $options_Data_Stat
-                                    . "</div>"
+                                    . "</div>";
+                if($temppolldata[14] != "" && $temppolldata[15] != 0)
+                {
+                    $htmldata=$htmldata."<div class='poll_feed_voted'><img src='img/Voted.png' /></div>";
+                }
+                $htmldata=$htmldata . "<div class='clear_both'></div>"
                                     . "<div class='poll_action_container'>"
-                                        . "<div class='poll_vote'>Total Votes : $vote_count</div>"
-                                        . "<div class='poll_duration'>Poll closing by $temppolldata[8]</div>"
+                                        . "<div class='poll_vote'>Total Votes :$vote_count</div>"
+                                        . "<div class='poll_duration'>Closed on ".date("jS M Y",strtotime($temppolldata[8]))."</div>"
                                     . "</div>"
+                                    . "<div class='clear_both'></div>"
                                 . "</div>"
-                            . "<div class='clear'></div>";
+                            . "<div class='clear_both'></div>";
             }
         }
         return $htmldata;
     }
     
-    public function poll_vote($pollid,$polloption)
+    public function get_poll_feeds_onid($id,$userid) {
+        $pollobj=new dn_model_layer();
+        $pollresult_data=$pollobj->get_Poll_Feeds_OnId($id,$userid);
+        $htmldata="";
+        $options_Data="";
+        $options_Data_Stat="";
+        $option1_count=0;$option2_count=0;$option3_count=0;
+        $option4_count=0;$option5_count=0;
+        $option1_percent=0;$option2_percent=0;$option3_percent=0;
+        $option4_percent=0;$option5_percent=0;
+        for ($index = 0; $index < mysqli_num_rows($pollresult_data); $index++) {
+            $options_Data="";
+            $options_Data_Stat="";
+            $temppolldata= mysqli_fetch_row($pollresult_data);
+            $vote_count=$temppolldata[10]+$temppolldata[11]+$temppolldata[12]+$temppolldata[13]+$temppolldata[14];
+            if(strlen($temppolldata[3])!=0)
+            {
+                $options_Data= "<li class='poll_option_item' id='poll_$temppolldata[0]_1'><input type='radio' name='$temppolldata[0]_option' id='$temppolldata[0]_option1' value='1'><label for='$temppolldata[0]_option1'>$temppolldata[3]</label><div class='check'></div></li>";
+                $option1_count=$temppolldata[10];
+                if($vote_count==0)
+                {
+                    $option1_percent=0;
+                }
+                else
+                {
+                    $option1_percent=round(($option1_count/$vote_count)*100);
+                }
+                $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_1' style='display:none;'><div class='poll_item_stat' style='width:$option1_percent%;background-color:lightgray;'>$option1_percent%</div><div class='poll_item_overlay'>$temppolldata[3]</div></div>";
+                $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option1_percent%;background-color:lightgray;'>$option1_percent%</div><div class='poll_item_overlay'>$temppolldata[3]</div></div>";
+            }
+            if(strlen($temppolldata[4])!=0)
+            {
+                $options_Data=$options_Data."<li class='poll_option_item' id='poll_$temppolldata[0]_2'><input type='radio' name='$temppolldata[0]_option' id='$temppolldata[0]_option2' value='2'><label for='$temppolldata[0]_option2'>$temppolldata[4]</label><div class='check'></div></li>";
+                $option2_count=$temppolldata[11];
+                if($vote_count==0)
+                {
+                    $option2_percent=0;
+                }
+                else
+                {
+                    $option2_percent=round(($option2_count/$vote_count)*100);
+                }
+                $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_2' style='display:none;'><div class='poll_item_stat' style='width:$option2_percent%;background-color:lightgray;'>$option2_percent%</div><div class='poll_item_overlay'>$temppolldata[4]</div></div>";
+                $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option2_percent%;background-color:lightgray;'>$option2_percent%</div><div class='poll_item_overlay'>$temppolldata[4]</div></div>";
+            }
+            
+            if(strlen($temppolldata[5])!=0)
+            {
+                $options_Data=$options_Data."<li class='poll_option_item' id='poll_$temppolldata[0]_3'><input type='radio' name='$temppolldata[0]_option' id='$temppolldata[0]_option3' value='3'><label for='$temppolldata[0]_option3'>$temppolldata[5]</label><div class='check'></div></li>";
+                $option3_count=$temppolldata[12];
+                if($vote_count==0)
+                {
+                    $option3_percent=0;
+                }
+                else
+                {
+                    $option3_percent=round(($option3_count/$vote_count)*100);
+                }
+                $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_3' style='display:none;'><div class='poll_item_stat' style='width:$option3_percent%;background-color:lightgray;'>$option3_percent%</div><div class='poll_item_overlay'>$temppolldata[5]</div></div>";
+                $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option3_percent%;background-color:lightgray;'>$option3_percent%</div><div class='poll_item_overlay'>$temppolldata[5]</div></div>";
+            }
+            if(strlen($temppolldata[6])!=0)
+            {
+                $options_Data=$options_Data. "<li class='poll_option_item' id='poll_$temppolldata[0]_4'><input type='radio' name='$temppolldata[0]_option' id='$temppolldata[0]_option4' value='4'><label for='$temppolldata[0]_option4'>$temppolldata[6]</label><div class='check'></div></li>";
+                $option4_count=$temppolldata[13];
+                if($vote_count==0)
+                {
+                    $option4_percent=0;
+                }
+                else
+                {
+                    $option4_percent=round(($option4_count/$vote_count)*100);
+                }
+                $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_4' style='display:none;'><div class='poll_item_stat' style='width:$option4_percent%;background-color:lightgray;'>$option4_percent%</div><div class='poll_item_overlay'>$temppolldata[6]</div></div>";
+                $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option4_percent%;background-color:lightgray;'>$option4_percent%</div><div class='poll_item_overlay'>$temppolldata[6]</div></div>";
+            }
+            if(strlen($temppolldata[7])!=0)
+            {
+                $options_Data=$options_Data."<li class='poll_option_item' id='poll_$temppolldata[0]_5'><input type='radio' name='$temppolldata[0]_option' id='$temppolldata[0]_option5' value='5'><label for='$temppolldata[0]_option5'>$temppolldata[7]</label><div class='check'></div></li>";
+                $option4_count=$temppolldata[14];
+                if($vote_count==0)
+                {
+                    $option5_percent=0;
+                }
+                else
+                {
+                    $option5_percent=round(($option5_count/$vote_count)*100);
+                }
+                $options_Data=$options_Data."<div class='poll_item_container' id='poll_vote_stat_$temppolldata[0]_5' style='display:none;'><div class='poll_item_stat' style='width:$option5_percent%;background-color:lightgray;'>$option5_percent%</div><div class='poll_item_overlay'>$temppolldata[7]</div></div>";
+                $options_Data_Stat=$options_Data_Stat."<div class='poll_item_container'><div class='poll_item_stat' style='width:$option5_percent%;background-color:lightgray;'>$option5_percent%</div><div class='poll_item_overlay'>$temppolldata[7]</div></div>";
+            }
+            if(strpos($temppolldata[9],'-')===0 && ($temppolldata[15] == "" || $temppolldata[15] ==0) )
+            {
+                $htmldata=$htmldata."<div class='v_poll_feed_container'>"
+                                    . "<div class='poll_feed_title'>$temppolldata[1]</div>"
+                                    . "<div class='poll_feed_question'>$temppolldata[2]</div>"
+                                    . "<div class='poll_feed_options'>"
+                                        . "<ul>"
+                                            . $options_Data
+                                        ."</ul>"
+                                    . "</div>"
+                                    . "<div class='clear_both'></div>"
+                                    . "<div class='poll_action_container'>"
+                                        . "<div class='poll_vote' id='poll_vote_btn_$temppolldata[0]'><button class='poll_vote_btn' id='$temppolldata[0]_btn' onclick='update_poll_vote($temppolldata[0]);'>Vote</button></div>"
+                                        . "<div class='poll_vote' id='poll_vote_count_$temppolldata[0]' style='display:none;' val='$vote_count'>Total Votes : $vote_count</div>"
+                                        . "<div class='poll_duration'>Poll closing by ".date("jS M Y",strtotime($temppolldata[8]))."</div>"
+                                    . "</div>"
+                                    . "<div class='clear_both'></div>"
+                                . "</div>"
+                            . "<div class='clear_both'></div>";
+            }
+            else
+            {
+                $htmldata=$htmldata."<div class='v_poll_feed_container'>"
+                                    . "<div class='poll_feed_title'>$temppolldata[1]</div>"
+                                    . "<div class='poll_feed_question'>$temppolldata[2]</div>"
+                                    . "<div class='poll_feed_options'>"
+                                            . $options_Data_Stat
+                                    . "</div>";
+                if($temppolldata[14] != "" && $temppolldata[15] != 0)
+                {
+                    $htmldata=$htmldata."<div class='poll_feed_voted'><img src='img/Voted.png' /></div>";
+                }
+                $htmldata=$htmldata . "<div class='clear_both'></div>"
+                                    . "<div class='poll_action_container'>"
+                                        . "<div class='poll_vote'>Total Votes :$vote_count</div>"
+                                        . "<div class='poll_duration'>Closed on ".date("jS M Y",strtotime($temppolldata[8]))."</div>"
+                                    . "</div>"
+                                    . "<div class='clear_both'></div>"
+                                . "</div>"
+                            . "<div class='clear_both'></div>";
+            }
+        }
+        return $htmldata;
+    }
+    
+    public function poll_vote($pollid,$polloption,$userid)
     {
         $pollvoteobj=new dn_model_layer();
-        echo $pollvoteobj->poll_Vote($pollid, $polloption);
+        echo $pollvoteobj->poll_Vote($pollid, $polloption,$userid);
     }
     
     public function signup_profile($email,$password,$name)
@@ -443,11 +647,13 @@ class dn_Controller_layer {
         $user_id= $this->post_id_rand_str(8);
         echo $signobj->signup_profile($user_id,$email, $password, $name);
     }
+    
     public function login_check($emailid,$password,$device)
     {
         $loginobj=new dn_model_layer();
-        echo $loginobj->login_Check($emailid, $password,$device);
+        return $loginobj->login_Check($emailid, $password,$device);
     }
+    
     public function forgotpassword_action($emailid) {
         $objpass = new dn_model_layer();
         $token= $this->post_id_rand_str(16);
@@ -493,15 +699,24 @@ class dn_Controller_layer {
         }
         return $tempret;
     }
+    
     public function resetpassword_action($emailid,$token) 
     {
         $resetobj=new dn_model_layer();
         return $resetobj->resetpassword_Action($emailid, $token);
     }
+    
     public function resetpassword_change($emailid,$password) 
     {
         $resetpassobj=new dn_model_layer();
         echo $resetpassobj->resetpassword_Change($emailid, md5($password));
+    }
+    
+    public function retrive_metadata($id,$type)
+    {
+        $metaobj=new dn_model_layer();
+        $result=$metaobj->retrive_Metadata($id, $type);
+        return $result;
     }
 }
 

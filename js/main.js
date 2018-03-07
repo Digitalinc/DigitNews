@@ -23,24 +23,24 @@
     }
 }());
 
-// Get height on Window resized
-$(window).on('resize',function(){
-    var slideHeight = $('.slick-track').innerHeight();
-	return false;
-});
+//// Get height on Window resized
+//$(window).on('resize',function(){
+//    var slideHeight = $('.slick-track').innerHeight();
+//	return false;
+//});
 
 
-// Smooth scroll <a> links 
-var $root = $('html, body');
-$('a.s-scroll').on('click',function() {
-    var href = $.attr(this, 'href');
-    $root.animate({
-        scrollTop: $(href).offset().top
-    }, 500, function () {
-        window.location.hash = href;
-    });
-    return false;
-});
+//// Smooth scroll <a> links 
+//var $root = $('html, body');
+//$('a.s-scroll').on('click',function() {
+//    var href = $.attr(this, 'href');
+//    $root.animate({
+//        scrollTop: $(href).offset().top
+//    }, 500, function () {
+//        window.location.hash = href;
+//    });
+//    return false;
+//});
 
 // Email validation text
 /*document.addEventListener("DOMContentLoaded", function() {
@@ -154,6 +154,7 @@ $(function(){
 	// Helper function to Fill and Center the HTML5 Video
 	$('.video-container video, .video-container object').maximage('maxcover');
 });
+
 /** youtube / vimeo background */
 $(function(){
     if(backgroundVideoUrl != 'none'){

@@ -418,3 +418,81 @@ td,
 th {
   padding: 0;
 }
+
+.social-share-btns-container {
+  overflow: hidden;
+  left: 0;
+  margin-top: 10px;
+  font-size: 0;
+  width: 100%;
+  z-index: 111;
+}
+
+.social-share-btns {
+  display: inline-block;
+  overflow: hidden;
+}
+.social-share-btns .share-btn {
+  float: left;
+  margin: 0 5px;
+  margin-top: 5px;
+  padding: 8px 16px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  vertical-align: middle;
+  -moz-transition: background 0.2s ease-in-out;
+  -o-transition: background 0.2s ease-in-out;
+  -webkit-transition: background 0.2s ease-in-out;
+  transition: background 0.2s ease-in-out;
+}
+.social-share-btns .share-btn i {
+  margin-right: 5px;
+  display: inline-block;
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.share-btn {
+  background-color: #95a5a6;
+}
+.share-btn:hover {
+  background-color: #798d8f;
+}
+
+.share-btn-twitter {
+  background-color: #00aced;
+}
+.share-btn-twitter:hover {
+  background-color: #0087ba;
+}
+
+.share-btn-facebook {
+  background-color: #3b5998;
+}
+.share-btn-facebook:hover {
+  background-color: #2d4373;
+}
+
+.share-btn-linkedin {
+  background-color: #007bb6;
+}
+.share-btn-linkedin:hover {
+  background-color: #005983;
+}
+
+.share-btn-mail {
+  background-color: #f1c40f;
+}
+.share-btn-mail:hover {
+  background-color: #dab10d;
+}
+.share-btn-googleplus
+{
+    background-color: #d34836;
+}
+.share-btn-googleplus:hover
+{
+    background-color: #c93d2b;
+}

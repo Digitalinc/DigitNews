@@ -42,8 +42,15 @@ if (isset($_GET["Action"])) {
     }
     if($_GET["Action"] == "pollvote")
     {
+        if($_SESSION["user_id"]==0)
+        {
+         echo "login";   
+        }
+        else
+        {
         $voteobj=new dn_controller_layer();
-        echo $voteobj->poll_vote($_POST["poll_id"], $_POST["poll_option"]);
+        echo $voteobj->poll_vote($_POST["poll_id"], $_POST["poll_option"],$_SESSION["user_id"]);
+        }
     }
     if($_GET["Action"] == "signupprofile")
     {
@@ -56,7 +63,7 @@ if (isset($_GET["Action"])) {
         $user_id=$loginobj->login_check($_POST["login_email"], md5($_POST["login_password"]),$_GET["device"]);
         if($user_id != "Failure")
         {
-            $_SESSION["userid"]=$user_id;
+            $_SESSION["user_id"]=$user_id;
         }
         else
         {

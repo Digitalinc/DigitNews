@@ -1,8 +1,5 @@
 "use strict";
-/**
- * downCount: Simple Countdown clock with offset
- * Author: Sonny T. <hi@sonnyt.com>, sonnyt.com
- */
+
 $(".alt-clock .clock-place").append("<div class='clock-container' > <header class='c-logo-top'> <img class='logo' src='./img/logo_only.png' alt='Logo image'> </header> <div class='c-metric c-layout'> <div class='c-dot-small'> <div class='rot30 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot60 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot120 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot150 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot210 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot240 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot300 c-rect-s c-rect'> <div class='c-mes'></div> </div> <div class='rot330 c-rect-s c-rect'> <div class='c-mes'></div> </div> </div> <div class='c-minsec-number'> <div class='c-top c-num'>00</div> <div class='c-right c-num'>15</div> <div class='c-bottom c-num'>30</div> <div class='c-left c-num'>45</div> </div> </div> <div class='c-minute-bg c-layout'> <div class='c-circle'></div> </div> <div class='c-minute c-layout '> <div class='c-circle'></div> <div class='c-dot'></div> </div> <div class='c-second-bg c-layout'> <div class='c-circle'></div> </div> <div class='c-second c-layout '> <div class='c-circle'></div> <div class='c-dot'></div> </div> <div class='c-layout c-separator'> <div class='c-fill'> </div> </div> <div class='c-hour c-layout'> <span class='number hours'>00</span> <span class='metric'>h</span> </div> <div class='c-day c-layout'> <span class='number days'>000</span> <span class='metric'>days</span> </div> </div>");
 
 if($(".alt-clock .clock-place").attr('data-logosrc') 
