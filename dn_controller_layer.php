@@ -49,10 +49,17 @@ class dn_Controller_layer {
         for ($index = 0; $index < count($jsonobj["articles"]); $index++) {
             $tempjson = $jsonobj["articles"][$index];
             $obj = new dn_model_layer();
-            $retvalue = $obj->insertFeeds($this->post_id_rand_str(9),0, $source_uniqueid, htmlentities($tempjson["title"], ENT_QUOTES), htmlentities($tempjson["description"], ENT_QUOTES), htmlentities($tempjson["author"], ENT_QUOTES), htmlentities($tempjson["url"], ENT_QUOTES), htmlentities($tempjson["urlToImage"], ENT_QUOTES), htmlentities($tempjson["publishedAt"], ENT_QUOTES));
-            if (strcmp($retvalue, "Success") == 0) {
-                $successcount = $successcount + 1;
-            } else {
+            if(strlen($tempjson["description"])>75)
+            {
+                $retvalue = $obj->insertFeeds($this->post_id_rand_str(9),0, $source_uniqueid, htmlentities($tempjson["title"], ENT_QUOTES), htmlentities($tempjson["description"], ENT_QUOTES), htmlentities($tempjson["author"], ENT_QUOTES), htmlentities($tempjson["url"], ENT_QUOTES), htmlentities($tempjson["urlToImage"], ENT_QUOTES), htmlentities($tempjson["publishedAt"], ENT_QUOTES));
+                if (strcmp($retvalue, "Success") == 0) {
+                    $successcount = $successcount + 1;
+                } else {
+                    $failurecount = $failurecount + 1;
+                }
+            }
+            else 
+            {
                 $failurecount = $failurecount + 1;
             }
         }
