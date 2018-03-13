@@ -39,6 +39,7 @@ if (session_id() == '') {
                 $.ajaxSetup({async: true});
                 return returndata;
             }
+            
             function getVideosFromChannel(channelid, nextpagetoken,channelno)
             {
                 var title, videoid, bannerval, uploaddate, noviews, description, tags;
@@ -160,9 +161,73 @@ if (session_id() == '') {
                 );
                 $("#overall").html(overallstatus);
             }
+        
+             function parse_feeds(tkid)
+            {
+                var mn=0;
+                var mx=0;
+                if (tkid == 0)
+                {
+                    url = 'http://www.digitnews.in/Action_page.php?Action=parsefeedsAPI';
+                    $.get(
+                        url,
+                        {},
+                        function (data)
+                        {
+                            
+                        }
+                    );
+                } else
+                {
+                    $.get(
+                            'http://www.digitnews.in/Action_page.php?Action=sourceminmax',
+                            {},
+                            function (data)
+                            {
+                               mn=parseInt(data.split(",")[0]);
+                               mx=parseInt(data.split(",")[1]);
+                               $.ajaxSetup({async: false});
+                                for (var i = mn; i <= mx; i++) {
+                                    $("#feed_status_data").html("loading");
+                                    url = 'http://www.digitnews.in/Action_page.php?Action=parsefeedsnoAPI&sid=';
+                                    url=url+i;
+                                    $.get(
+                                        url,
+                                        {},
+                                        function (data)
+                                        {
+                                            if (i==mx)
+                                            {
+                                                $("#feed_status_data").html("loaded.");
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                }
+                
+            }
+            function load_status()
+            {
+                $.get(
+                            'http://www.digitnews.in/Action_page.php?Action=getdashboardst',
+                            {},
+                            function (data)
+                            {
+                               $("#feed_status_data").html(data);
+                            }
+                        );
+            }
         </script>
     </head>
     <body>
+        <div><h2>News Feeds</h2>
+            <br />
+            <button class="btn-sm nopadding" onclick="javascript:parse_feeds(0);">Parse Feeds API</button> &nbsp; &nbsp;
+            <button class="btn-sm nopadding" onclick="javascript:parse_feeds(1);">Parse Feeds Non API</button>&nbsp; &nbsp;
+            <button class="btn-sm nopadding" onclick="javascript:load_status();">Load Status</button>&nbsp; &nbsp;
+        </div>
         <div><h2>Video Feeds:</h2>
             <div id='parsestatus'> No Of Videos Loaded : 
                 <input id="totalval" value="0"></input>
@@ -185,7 +250,8 @@ if (session_id() == '') {
             &nbsp;&nbsp;
             <button class="btn-sm nopadding" onclick="javascript:loadchannellist(1);">English</button>
         </div>
-
+        
+        <div id="feed_status_data"></div>
         <script>
             $("#loadstatus").hide();
         </script>

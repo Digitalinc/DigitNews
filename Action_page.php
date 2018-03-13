@@ -12,11 +12,26 @@ if (!isset($_SESSION["language"])) {
 }
 include 'dn_controller_layer.php';
 if (isset($_GET["Action"])) {
-    if ($_GET["Action"] == "parsefeeds") {
-        $parsefeed = new dn_Controller_layer();
-        $strretval=str_replace("\n","<br>",$parsefeed->parse_sources_feed());
-        $strretval=$strretval."<br>".str_replace("\n", "<br>", $parsefeed->parse_sources_woapi_feed());
-        echo $strretval;
+    if($_GET["Action"] == "sourceminmax")
+    {
+        $minmaxobj=new dn_Controller_layer();
+        echo $minmaxobj->parse_sources_woapi_minmax();
+    }
+    if($_GET["Action"]=="getdashboardst")
+    {
+        $stobj=new dn_Controller_layer();
+        echo $stobj->feed_dashboard_return_data();
+    }
+    if ($_GET["Action"] == "parsefeedsAPI") {
+        $parsefeedapi = new dn_Controller_layer();
+        //$strretval=str_replace("\n","<br>",$parsefeed->parse_sources_feed());
+        //$strretval=$strretval."<br>".str_replace("\n", "<br>", $parsefeed->parse_sources_woapi_feed());
+        $parsefeedapi->parse_sources_feed();
+    }
+    if($_GET["Action"] == "parsefeedsnoAPI")
+    {
+        $parsefeednoapi=new dn_Controller_layer();
+        $parsefeednoapi->parse_sources_woapi_feed($_GET["sid"]);
     }
     if ($_GET["Action"] == "updatevideofeed") {
         $parsevideo = new dn_Controller_layer();

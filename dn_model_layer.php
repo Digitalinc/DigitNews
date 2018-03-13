@@ -41,6 +41,30 @@ class dn_model_layer {
             return $resultset;
         }
     }
+    
+    public function getFeedSources_WoAPI_Sid($sid) {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            $this->query = "select source_unique_id,source_id,source_url from sources_metadata1 where source_unique_id=$sid";
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
+        }
+    }
+    
+    public function getFeedSources_WoAPI_MinMax() {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            $this->query = "select MIN(source_unique_id),MAX(source_unique_id) from sources_metadata1";
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
+        }
+    }
 
     public function insertFeeds($feedid,$user, $sourceid, $title, $description, $author, $url, $urltoimg, $publishedat) {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
@@ -362,16 +386,15 @@ public function get_Feeds_onid($id) {
         }
     }
     
-    public function parse_Feed_Dashboard_Status($source_unique_id,$status,$userid) 
+    public function parse_Feed_Dashboard_Status($source_id,$source_unique_id,$successcount, $failurecount) 
     {
         $con = mysqli_connect($this->dbserver, $this->username, $this->password);
         if (!$con) {
             return FALSE;
         } else {
                 mysqli_select_db($con, $this->dbname);
-                $key = str_shuffle($videoid);
                 $this->query = "insert into "
-                                . "parse_feed_dashboard_status values('" . date("Y-m-d h:i:sa") . "',$source_unique_id,'$status',$userid)";
+                                . "parse_feed_dashboard_status values('" . date("Y-m-d") . "','$source_id',$source_unique_id,$successcount,$failurecount,'" . date("Y-m-d h:i:sa") . "')";
                 mysqli_query($con, $this->query);
                 
         }
@@ -644,6 +667,19 @@ public function get_Feeds_onid($id) {
             $resultset = mysqli_query($con, $this->query);
             return $resultset;
         }
+    }
+    
+    public function feed_Dashboard_Return_Data() 
+    {
+        $con = mysqli_connect($this->dbserver, $this->username, $this->password);
+        if (!$con) {
+            return FALSE;
+        } else {
+            mysqli_select_db($con, $this->dbname);
+            $this->query = "Select * from parse_feed_dashboard_status where feed_entry_date='".date("Y-m-d")."'";
+            $resultset = mysqli_query($con, $this->query);
+            return $resultset;
+        } 
     }
 }
 

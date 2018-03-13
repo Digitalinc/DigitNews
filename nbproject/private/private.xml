@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/DigitNews_new/js/ScriptFunctions.js</file>
-            <file>file:/C:/xampp/htdocs/DigitNews_new/Master_Page_Footer.php</file>
-            <file>file:/C:/xampp/htdocs/DigitNews_new/Videos.php</file>
+            <file>file:/C:/xampp/htdocs/DigitNews_new/dn_model_layer.php</file>
+            <file>file:/C:/xampp/htdocs/DigitNews_new/Data_Parser.php</file>
+            <file>file:/C:/xampp/htdocs/DigitNews_new/dn_controller_layer.php</file>
+            <file>file:/C:/xampp/htdocs/DigitNews_new/Action_page.php</file>
         </group>
     </open-files>
 </project-private>
