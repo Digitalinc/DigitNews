@@ -186,8 +186,17 @@ if (session_id() == '') {
                             {
                                mn=parseInt(data.split(",")[0]);
                                mx=parseInt(data.split(",")[1]);
+                               if(tkid == 1)
+                               {
+                                   itmx=parseInt(mn)+parseInt(50);
+                               }
+                               else
+                               {
+                                   itmx=parseInt(tkid)+parseInt(50);
+                               }
+                               
                                $.ajaxSetup({async: false});
-                                for (var i = mn; i <= mx; i++) {
+                                for (var i = mn; i <= itmx; i++) {
                                     $("#feed_status_data").html("loading");
                                     url = 'http://www.digitnews.in/Action_page.php?Action=parsefeedsnoAPI&sid=';
                                     url=url+i;
@@ -200,6 +209,10 @@ if (session_id() == '') {
                                             {
                                                 $("#feed_status_data").html("loaded.");
                                             }
+                                            if (i==itmx)
+                                            {
+                                                parse_feeds(itmx);
+                                            }
                                         }
                                     );
                                 }
@@ -208,6 +221,7 @@ if (session_id() == '') {
                 }
                 
             }
+            
             function load_status()
             {
                 $.get(
